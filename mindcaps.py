@@ -3,6 +3,8 @@ import sqlite3
 import threading
 import time
 import random
+import csv 
+import matplotlib.pyplot as plt
 
 # Create or connect to SQLite database
 conn = sqlite3.connect("mindcaps.db")
@@ -168,5 +170,6 @@ CREATE TABLE IF NOT EXISTS moods (
     result_label.config(text=f"Recent Mood Trend:\n{trend}")
 
 tk.Button(window, text="Show Mood Trend", command=show_trend).pack(pady=10)
+
 
     
