@@ -59,7 +59,7 @@ def analyze_sentiment(note):
 # GUI setup
 window = tk.Tk()
 window.title("MindCaps - Mental Wellness App")
-window.geometry("400x750") # Increased height again for new button
+window.geometry("400x800") # Increased height again for new button
 window.resizable(False, False)
 
 # Mood selection
@@ -153,6 +153,23 @@ def show_visual_trend():
     plt.grid(True)
     plt.show()
 
+def show_mood_pie_chart():
+    cursor.execute("SELECT mood, COUNT(*) FROM moods GROUP BY mood")
+    rows = cursor.fetchall()
+    
+    if not rows:
+        result_label.config(text="No entries to visualize.")
+        return
+
+    moods = [row[0] for row in rows]
+    counts = [row[1] for row in rows]
+
+    plt.figure(figsize=(7, 7))
+    plt.pie(counts, labels=moods, autopct='%1.1f%%', startangle=140)
+    plt.title("Mood Distribution")
+    plt.axis('equal') # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.show()
+
 def breathing_exercise():
     def run():
         btn_breathing.config(state=tk.DISABLED)
@@ -183,7 +200,8 @@ def export_data():
 # Buttons
 tk.Button(window, text="Save Mood", command=save_entry).pack(pady=5)
 tk.Button(window, text="Show Mood Trend", command=show_trend).pack(pady=5)
-tk.Button(window, text="Show Visual Graph", command=show_visual_trend, bg="#e0f7fa").pack(pady=5) # New Button
+tk.Button(window, text="Show Visual Graph", command=show_visual_trend, bg="#e0f7fa").pack(pady=5)
+tk.Button(window, text="Show Mood Pie Chart", command=show_mood_pie_chart, bg="#ffecb3").pack(pady=5) # New Button
 btn_breathing = tk.Button(window, text="Start Breathing Exercise", command=breathing_exercise)
 btn_breathing.pack(pady=5)
 tk.Button(window, text="Export to CSV", command=export_data, bg="#e1f5fe").pack(pady=10)
