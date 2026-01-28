@@ -5,6 +5,7 @@ import time
 import random
 import csv 
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # Create or connect to SQLite database
 conn = sqlite3.connect("mindcaps.db")
@@ -58,7 +59,7 @@ def analyze_sentiment(note):
 # GUI setup
 window = tk.Tk()
 window.title("MindCaps - Mental Wellness App")
-window.geometry("400x700") # Increased height to fit all elements
+window.geometry("400x750") # Increased height again for new button
 window.resizable(False, False)
 
 # Mood selection
@@ -125,6 +126,33 @@ def show_trend():
     else:
         result_label.config(text="No entries yet.")
 
+def show_visual_trend():
+    cursor.execute("SELECT mood, intensity, timestamp FROM moods ORDER BY timestamp ASC")
+    rows = cursor.fetchall()
+    
+    if not rows:
+        result_label.config(text="No entries to visualize.")
+        return
+
+    dates = [row[2] for row in rows]
+    intensities = [row[1] for row in rows]
+    moods = [row[0] for row in rows]
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(dates, intensities, marker='o', linestyle='-', color='b', label='Intensity')
+    
+    # Annotate points with mood names
+    for i, txt in enumerate(moods):
+        plt.annotate(txt, (dates[i], intensities[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+    plt.title("Mood Intensity Over Time")
+    plt.xlabel("Date/Time")
+    plt.ylabel("Intensity (1-10)")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.grid(True)
+    plt.show()
+
 def breathing_exercise():
     def run():
         btn_breathing.config(state=tk.DISABLED)
@@ -155,6 +183,7 @@ def export_data():
 # Buttons
 tk.Button(window, text="Save Mood", command=save_entry).pack(pady=5)
 tk.Button(window, text="Show Mood Trend", command=show_trend).pack(pady=5)
+tk.Button(window, text="Show Visual Graph", command=show_visual_trend, bg="#e0f7fa").pack(pady=5) # New Button
 btn_breathing = tk.Button(window, text="Start Breathing Exercise", command=breathing_exercise)
 btn_breathing.pack(pady=5)
 tk.Button(window, text="Export to CSV", command=export_data, bg="#e1f5fe").pack(pady=10)
