@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCaps - Mental Wellness App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">🧠 MindCaps</h1>
+            <p class="subtitle">Your AI-Powered Mental Wellness Companion</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mood Tracking Section -->
+            <section class="card mood-section">
+                <h2>How are you feeling today?</h2>
+                
+                <!-- Mood Selection -->
+                <div class="mood-selector">
+                    <div class="mood-options">
+                        <button class="mood-btn" data-mood="Happy" data-emoji="😊">
+                            <span class="emoji">😊</span>
+                            <span>Happy</span>
+                        </button>
+                        <button class="mood-btn" data-mood="Sad" data-emoji="😢">
+                            <span class="emoji">😢</span>
+                            <span>Sad</span>
+                        </button>
+                        <button class="mood-btn" data-mood="Stressed" data-emoji="😰">
+                            <span class="emoji">😰</span>
+                            <span>Stressed</span>
+                        </button>
+                        <button class="mood-btn" data-mood="Angry" data-emoji="😠">
+                            <span class="emoji">😠</span>
+                            <span>Angry</span>
+                        </button>
+                        <button class="mood-btn" data-mood="Calm" data-emoji="😌">
+                            <span class="emoji">😌</span>
+                            <span>Calm</span>
+                        </button>
+                        <button class="mood-btn" data-mood="Excited" data-emoji="🤩">
+                            <span class="emoji">🤩</span>
+                            <span>Excited</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="selected-mood" value="">
+                </div>
+
+                <!-- Intensity Slider -->
+                <div class="intensity-section">
+                    <label for="intensity-slider">Intensity Level (1-10)</label>
+                    <div class="slider-container">
+                        <input type="range" id="intensity-slider" min="1" max="10" value="5" class="slider">
+                        <span id="intensity-value" class="intensity-display">5</span>
+                    </div>
+                </div>
+
+                <!-- Note Input -->
+                <div class="note-section">
+                    <label for="note-input">Tell us more about how you're feeling...</label>
+                    <textarea id="note-input" placeholder="Write your thoughts, feelings, or what triggered this mood..." rows="5"></textarea>
+                </div>
+
+                <!-- Sentiment Display -->
+                <div id="sentiment-display" class="sentiment-display hidden"></div>
+
+                <!-- Prompt -->
+                <div id="prompt-display" class="prompt-display"></div>
+
+                <!-- Save Button -->
+                <button id="save-btn" class="btn btn-primary">Save Entry</button>
+                <div id="save-message" class="message hidden"></div>
+            </section>
+
+            <!-- Motivational Quote Section -->
+            <section class="card quote-section">
+                <h3>Daily Inspiration</h3>
+                <div class="quote-box">
+                    <p id="quote-text" class="quote-text"></p>
+                </div>
+                <button id="new-quote-btn" class="btn btn-secondary">New Quote</button>
+            </section>
+
+            <!-- Recent Entries Section -->
+            <section class="card entries-section">
+                <h3>Recent Entries</h3>
+                <div id="entries-list" class="entries-list">
+                    <p class="no-entries">No entries yet. Start tracking your mood!</p>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section class="card analytics-section">
+                <h3>Your Mood Analytics</h3>
+                <div id="analytics-container" class="analytics-container">
+                    <div class="stat">
+                        <span class="stat-label">Total Entries</span>
+                        <span class="stat-value" id="total-entries">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Most Common Mood</span>
+                        <span class="stat-value" id="common-mood">-</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Average Intensity</span>
+                        <span class="stat-value" id="avg-intensity">-</span>
+                    </div>
+                </div>
+                <button id="download-btn" class="btn btn-secondary">Download Data (CSV)</button>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 MindCaps - Your Mental Wellness Companion</p>
+            <p class="small">Your data is stored locally and never shared.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
