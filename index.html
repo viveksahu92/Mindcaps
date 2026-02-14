@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCaps | Elevate Your Mental Wellness</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js for Analytics -->
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-brain"></i>
+                <span>MindCaps</span>
+            </div>
+
+            <ul class="nav-links">
+                <li class="active" data-tab="dashboard">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li data-tab="journal">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Journal</span>
+                </li>
+                <li data-tab="analytics">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </li>
+                <li data-tab="resources">
+                    <i class="fa-solid fa-spa"></i>
+                    <span>Wellness</span>
+                </li>
+                <li data-tab="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="name">Hello, Friend</span>
+                    <span class="streak-badge"><i class="fa-solid fa-fire"></i> <span id="streak-count">0</span> Day
+                        Streak</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="greeting">
+                    <h1 id="greeting-text">Good Morning!</h1>
+                    <p class="date-display" id="current-date">October 24, 2023</p>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn" id="theme-toggle"><i class="fa-solid fa-moon"></i></button>
+                    <button class="btn btn-primary" id="new-entry-btn"><i class="fa-solid fa-plus"></i> New
+                        Entry</button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="dashboard-view" class="view active">
+                <div class="grid-container">
+                    <!-- Daily Quote -->
+                    <div class="card quote-card full-width">
+                        <div class="card-content">
+                            <i class="fa-solid fa-quote-left quote-icon"></i>
+                            <p id="quote-text" class="quote-text">Loading inspiration...</p>
+                            <button class="btn-text" id="new-quote-btn">New Quote <i
+                                    class="fa-solid fa-rotate-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Daily Gratitude -->
+                    <div class="card gratitude-card full-width">
+                        <h3><i class="fa-solid fa-hands-praying"></i> Daily Gratitude</h3>
+                        <div class="gratitude-input-group">
+                            <input type="text" id="gratitude-input" placeholder="What are you grateful for today?">
+                            <button class="btn btn-primary" id="add-gratitude-btn">Add</button>
+                        </div>
+                        <ul id="gratitude-list" class="gratitude-list">
+                            <!-- Gratitude items will be injected here -->
+                        </ul>
+                    </div>
+
+                    <!-- Mood Tracker -->
+                    <div class="card mood-card">
+                        <h3>How are you feeling right now?</h3>
+                        <div class="mood-selector">
+                            <button class="mood-btn" data-mood="Happy" data-emoji="😊" style="--color: #FFD93D;">
+                                <span class="emoji">😊</span>
+                                <span class="label">Happy</span>
+                            </button>
+                            <button class="mood-btn" data-mood="Sad" data-emoji="😢" style="--color: #6C5DD3;">
+                                <span class="emoji">😢</span>
+                                <span class="label">Sad</span>
+                            </button>
+                            <button class="mood-btn" data-mood="Stressed" data-emoji="😰" style="--color: #FF6B6B;">
+                                <span class="emoji">😰</span>
+                                <span class="label">Stessed</span>
+                            </button>
+                            <button class="mood-btn" data-mood="Calm" data-emoji="😌" style="--color: #4D96FF;">
+                                <span class="emoji">😌</span>
+                                <span class="label">Calm</span>
+                            </button>
+                            <button class="mood-btn" data-mood="Excited" data-emoji="🤩" style="--color: #FF8E00;">
+                                <span class="emoji">🤩</span>
+                                <span class="label">Excited</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="card stats-card">
+                        <h3>Weekly Snapshot</h3>
+                        <div class="mini-chart-container">
+                            <canvas id="weekly-mood-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Entries -->
+                    <div class="card entries-card full-width">
+                        <div class="card-header">
+                            <h3>Recent Entries</h3>
+                            <a href="#" class="see-all" data-target="journal">See All</a>
+                        </div>
+                        <div id="entries-list" class="entries-list">
+                            <!-- Entries will be injected here -->
+                            <div class="empty-state">
+                                <p>No entries yet. Start tracking your journey!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Journal View (Hidden by default) -->
+            <section id="journal-view" class="view">
+                <h2>Your Journal</h2>
+                <div class="journal-container" id="full-journal-list">
+                    <!-- Full list injected here -->
+                </div>
+            </section>
+
+            <!-- Analytics View -->
+            <section id="analytics-view" class="view">
+                <h2>Detailed Analytics</h2>
+                <div class="grid-container">
+                    <div class="card chart-card">
+                        <h3>Mood Distribution</h3>
+                        <canvas id="distribution-chart"></canvas>
+                    </div>
+                    <div class="card chart-card">
+                        <h3>Intensity History</h3>
+                        <canvas id="intensity-chart"></canvas>
+                    </div>
+                    <div class="card chart-card">
+                        <h3>Sleep Trends (v2)</h3>
+                        <canvas id="sleep-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wellness/Resources View -->
+            <section id="resources-view" class="view">
+                <h2>Wellness Toolkit</h2>
+                <div class="grid-container">
+                    <div class="card resource-card">
+                        <i class="fa-solid fa-lungs"></i>
+                        <h3>Breathing Exercise</h3>
+                        <p>4-7-8 Technique for instant calm.</p>
+                        <button class="btn btn-outline" id="start-breathing">Start</button>
+                    </div>
+                    
+                    <div class="card resource-card">
+                        <i class="fa-solid fa-hourglass-start"></i>
+                        <h3>Meditation Timer</h3>
+                        <div class="timer-display" id="timer-display">05:00</div>
+                        <div class="timer-controls">
+                            <button class="btn btn-outline" id="timer-toggle">Start Timer</button>
+                            <button class="btn btn-text" id="timer-reset">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="card resource-card">
+                        <i class="fa-solid fa-bed"></i>
+                        <h3>Sleep Tracker</h3>
+                        <div class="sleep-input">
+                            <label>Hours Slept</label>
+                            <input type="number" id="sleep-hours" min="0" max="24" step="0.5" value="8">
+                            <label>Quality</label>
+                            <select id="sleep-quality">
+                                <option value="Great">Great</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                            </select>
+                            <button class="btn btn-primary" id="save-sleep-btn" style="margin-top: 10px;">Log Sleep</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Settings View -->
+            <section id="settings-view" class="view">
+                <h2>Settings & Data</h2>
+                <div class="card full-width">
+                    <h3>Data Management</h3>
+                    <p>Export your data to backup or use in the desktop app.</p>
+                    <div class="actions" style="margin-top: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="export-btn"><i class="fa-solid fa-download"></i> Export
+                            JSON</button>
+                        <button class="btn btn-primary" id="import-btn"
+                            style="background: var(--warning); box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);"><i
+                                class="fa-solid fa-upload"></i> Import JSON</button>
+                        <input type="file" id="import-input" accept=".json" style="display: none;">
+                        <button class="btn btn-primary" id="clear-data-btn"
+                            style="background: var(--danger); box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);"><i
+                                class="fa-solid fa-trash"></i> Reset All Data</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- New Entry Modal -->
+    <div id="entry-modal" class="modal">
+        <div class="modal-content glass-effect">
+            <span class="close-modal">&times;</span>
+            <h2>New Journal Entry</h2>
+
+            <div class="form-group">
+                <label>Current Mood</label>
+                <div class="selected-mood-display">
+                    <span id="modal-selected-mood-emoji">😐</span>
+                    <span id="modal-selected-mood-label">Neutral</span>
+                </div>
+                <input type="hidden" id="modal-mood-input">
+            </div>
+
+            <div class="form-group">
+                <label>Intensity (1-10)</label>
+                <div class="slider-container">
+                    <input type="range" id="intensity-slider" min="1" max="10" value="5">
+                    <span id="intensity-value">5</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>What's on your mind?</label>
+                <textarea id="note-input" placeholder="Express yourself freely..." rows="5"></textarea>
+            </div>
+
+            <div id="sentiment-feedback" class="sentiment-feedback"></div>
+
+            <button id="save-btn" class="btn btn-primary full-width">Save Entry</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
