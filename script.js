@@ -140,41 +140,55 @@ function saveEntry() {
     const note = noteInput.value.trim();
     
     if (!mood) {
-        showMessage('Please select a mood!', 'error');
+        showMessage('⚠️ Please select a mood first!', 'error');
         return;
     }
     
     if (!note) {
-        showMessage('Please write a note!', 'error');
+        showMessage('⚠️ Please write a note about how you\'re feeling!', 'error');
         return;
     }
     
-    // Analyze sentiment
-    const sentiment = analyzeSentimentScore(note);
+    if (note.length < 10) {
+        showMessage('⚠️ Please write at least 10 characters in your note.', 'error');
+        return;
+    }
     
-    // Create entry object
-    const entry = {
-        id: Date.now(),
-        mood,
-        intensity: parseInt(intensity),
-        note,
-        sentiment,
-        timestamp: new Date().toISOString()
-    };
-    
-    // Save to localStorage
-    let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
-    entries.push(entry);
-    localStorage.setItem('mindcaps-entries', JSON.stringify(entries));
-    
-    showMessage('✅ Entry saved successfully!', 'success');
-    
-    // Reset form
-    resetForm();
-    
-    // Update displays
-    displayRecentEntries();
-    updateAnalytics();
+    try {
+        // Analyze sentiment
+        const sentiment = analyzeSentimentScore(note);
+        
+        // Create entry object
+        const entry = {
+            id: Date.now(),
+            mood,
+            intensity: parseInt(intensity),
+            note,
+            sentiment,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Save to localStorage with error handling
+        let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
+        entries.push(entry);
+        localStorage.setItem('mindcaps-entries', JSON.stringify(entries));
+        
+        showMessage('✅ Entry saved successfully!', 'success');
+        
+        // Reset form
+        resetForm();
+        
+        // Update displays
+        displayRecentEntries();
+        updateAnalytics();
+    } catch (error) {
+        if (error.name === 'QuotaExceededError') {
+            showMessage('❌ Storage is full! Please delete some entries or download and clear your data.', 'error');
+        } else {
+            showMessage('❌ Error saving entry. Please try again.', 'error');
+            console.error('Save error:', error);
+        }
+    }
 }
 
 function analyzeSentimentScore(note) {
@@ -212,55 +226,67 @@ function displayRandomQuote() {
 }
 
 function displayRecentEntries() {
-    let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
-    entries = entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
-    if (entries.length === 0) {
-        entriesList.innerHTML = '<p class="no-entries">No entries yet. Start tracking your mood!</p>';
-        return;
-    }
-    
-    entriesList.innerHTML = entries.slice(0, 10).map(entry => {
-        const date = new Date(entry.timestamp).toLocaleString();
-        const moodEmoji = getMoodEmoji(entry.mood);
-        const sentimentText = entry.sentiment === 1 ? '😊 Positive' : entry.sentiment === -1 ? '😟 Negative' : '😐 Neutral';
+    try {
+        let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
+        entries = entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         
-        return `
-            <div class="entry-item">
-                <div class="entry-header">
-                    <span class="entry-mood">${moodEmoji} ${entry.mood}</span>
-                    <span class="entry-date">${date}</span>
+        if (entries.length === 0) {
+            entriesList.innerHTML = '<p class="no-entries">No entries yet. Start tracking your mood!</p>';
+            return;
+        }
+        
+        entriesList.innerHTML = entries.slice(0, 10).map(entry => {
+            const date = new Date(entry.timestamp).toLocaleString();
+            const moodEmoji = getMoodEmoji(entry.mood);
+            const sentimentText = entry.sentiment === 1 ? '😊 Positive' : entry.sentiment === -1 ? '😟 Negative' : '😐 Neutral';
+            
+            return `
+                <div class="entry-item">
+                    <div class="entry-header">
+                        <span class="entry-mood">${moodEmoji} ${entry.mood}</span>
+                        <span class="entry-date">${date}</span>
+                    </div>
+                    <div class="entry-content">${escapeHtml(entry.note)}</div>
+                    <div>
+                        <span class="entry-intensity">Intensity: ${entry.intensity}/10</span> | 
+                        <span>${sentimentText}</span>
+                    </div>
                 </div>
-                <div class="entry-content">${escapeHtml(entry.note)}</div>
-                <div>
-                    <span class="entry-intensity">Intensity: ${entry.intensity}/10</span> | 
-                    <span>${sentimentText}</span>
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error displaying entries:', error);
+        entriesList.innerHTML = '<p class="no-entries">Error loading entries. Please refresh the page.</p>';
+    }
 }
 
 function updateAnalytics() {
-    let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
-    
-    // Total entries
-    document.getElementById('total-entries').textContent = entries.length;
-    
-    // Most common mood
-    if (entries.length > 0) {
-        const moodCounts = {};
-        entries.forEach(entry => {
-            moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
-        });
-        const mostCommon = Object.keys(moodCounts).reduce((a, b) => 
-            moodCounts[a] > moodCounts[b] ? a : b
-        );
-        document.getElementById('common-mood').textContent = `${getMoodEmoji(mostCommon)} ${mostCommon}`;
+    try {
+        let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
         
-        // Average intensity
-        const avgIntensity = (entries.reduce((sum, e) => sum + e.intensity, 0) / entries.length).toFixed(1);
-        document.getElementById('avg-intensity').textContent = avgIntensity;
+        // Total entries
+        document.getElementById('total-entries').textContent = entries.length;
+        
+        // Most common mood
+        if (entries.length > 0) {
+            const moodCounts = {};
+            entries.forEach(entry => {
+                moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+            });
+            const mostCommon = Object.keys(moodCounts).reduce((a, b) => 
+                moodCounts[a] > moodCounts[b] ? a : b
+            );
+            document.getElementById('common-mood').textContent = `${getMoodEmoji(mostCommon)} ${mostCommon}`;
+            
+            // Average intensity
+            const avgIntensity = (entries.reduce((sum, e) => sum + e.intensity, 0) / entries.length).toFixed(1);
+            document.getElementById('avg-intensity').textContent = avgIntensity;
+        } else {
+            document.getElementById('common-mood').textContent = '-';
+            document.getElementById('avg-intensity').textContent = '-';
+        }
+    } catch (error) {
+        console.error('Error updating analytics:', error);
     }
 }
 
@@ -277,40 +303,52 @@ function getMoodEmoji(mood) {
 }
 
 function downloadCSV() {
-    let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
-    
-    if (entries.length === 0) {
-        showMessage('No entries to download!', 'error');
-        return;
+    try {
+        let entries = JSON.parse(localStorage.getItem('mindcaps-entries')) || [];
+        
+        if (entries.length === 0) {
+            showMessage('⚠️ No entries to download!', 'error');
+            return;
+        }
+        
+        // Prepare CSV content
+        let csv = 'Date,Mood,Intensity,Note,Sentiment\n';
+        entries.forEach(entry => {
+            const date = new Date(entry.timestamp).toLocaleString();
+            const sentimentText = entry.sentiment === 1 ? 'Positive' : entry.sentiment === -1 ? 'Negative' : 'Neutral';
+            const note = entry.note.replace(/"/g, '""'); // Escape quotes
+            csv += `"${date}","${entry.mood}",${entry.intensity},"${note}","${sentimentText}"\n`;
+        });
+        
+        // Create blob and download
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mindcaps-entries-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        showMessage('✅ Data downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Download error:', error);
+        showMessage('❌ Error downloading data. Please try again.', 'error');
     }
-    
-    // Prepare CSV content
-    let csv = 'Date,Mood,Intensity,Note,Sentiment\n';
-    entries.forEach(entry => {
-        const date = new Date(entry.timestamp).toLocaleString();
-        const sentimentText = entry.sentiment === 1 ? 'Positive' : entry.sentiment === -1 ? 'Negative' : 'Neutral';
-        const note = entry.note.replace(/"/g, '""'); // Escape quotes
-        csv += `"${date}","${entry.mood}",${entry.intensity},"${note}","${sentimentText}"\n`;
-    });
-    
-    // Create blob and download
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `mindcaps-entries-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-    
-    showMessage('✅ Data downloaded successfully!', 'success');
 }
 
 function loadFromLocalStorage() {
-    // Initialize empty array if doesn't exist
-    if (!localStorage.getItem('mindcaps-entries')) {
-        localStorage.setItem('mindcaps-entries', JSON.stringify([]));
+    try {
+        // Initialize empty array if doesn't exist
+        if (!localStorage.getItem('mindcaps-entries')) {
+            localStorage.setItem('mindcaps-entries', JSON.stringify([]));
+        }
+        // Test if localStorage is accessible
+        localStorage.getItem('mindcaps-entries');
+    } catch (error) {
+        console.error('localStorage not available:', error);
+        alert('Warning: Local storage is not available. Your entries will not be saved.');
     }
 }
 
