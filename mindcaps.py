@@ -7,6 +7,7 @@ import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
 import atexit
+import re
 
 # Create or connect to SQLite database with proper error handling
 try:
@@ -56,14 +57,42 @@ prompts = {
     "Excited": ["What are you looking forward to?", "What's fueling your energy?"]
 }
 
-# Simple keyword-based sentiment analysis
+# Keyword-based sentiment analysis with negation handling
 positive_words = ["happy", "great", "calm", "excited", "love", "peace", "joy"]
 negative_words = ["sad", "angry", "stressed", "tired", "hate", "anxious", "worried"]
+negation_words = ["not", "don't", "never", "no", "didn't", "doesn't", "ain't", "can't", "won't", "wouldn't", "couldn't", "shouldn't", "isn't", "aren't", "wasn't", "weren't"]
 
 def analyze_sentiment(note):
     note = note.lower()
-    pos = sum(word in note for word in positive_words)
-    neg = sum(word in note for word in negative_words)
+    words = re.findall(r'\b\w+(?:\'\w+)?\b', note)
+    
+    pos = 0
+    neg = 0
+    
+    for i, word in enumerate(words):
+        if word in positive_words:
+            if i > 0 and words[i-1] in negation_words:
+                neg += 1
+            elif i > 1 and words[i-2] in negation_words:
+                neg += 1
+            elif i > 1 and words[i-2] == "no" and words[i-1] == "longer":
+                neg += 1
+            elif i > 2 and words[i-3] == "no" and words[i-2] == "longer":
+                neg += 1
+            else:
+                pos += 1
+        elif word in negative_words:
+            if i > 0 and words[i-1] in negation_words:
+                pos += 1
+            elif i > 1 and words[i-2] in negation_words:
+                pos += 1
+            elif i > 1 and words[i-2] == "no" and words[i-1] == "longer":
+                pos += 1
+            elif i > 2 and words[i-3] == "no" and words[i-2] == "longer":
+                pos += 1
+            else:
+                neg += 1
+                
     if pos > neg:
         return 1, "Positive mood detected 😊"
     elif neg > pos:
